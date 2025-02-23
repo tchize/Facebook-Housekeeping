@@ -1,4 +1,16 @@
 function deleteFacebookActivityLog_SearchHistory(index = 0) {
+  var errors = document.querySelectorAll('[aria-label="Close"]');
+  if (errors.length >0) {
+      var error = errors[0];
+      error.scrollIntoView();
+      error.click();
+      setTimeout(() => {
+        deleteFacebookActivityLog_SearchHistory(index + 1);
+        console.log("Previous deletion failed");
+      }, 250);
+      return;
+  }
+  
   var items = document.querySelectorAll('[aria-label="Action options"] > i');
   var item = items[index]
 
@@ -12,8 +24,8 @@ function deleteFacebookActivityLog_SearchHistory(index = 0) {
       var canDelete = false
       for (let i=0; i < opts.length; i += 1) {
           var opt = opts[i];
-          if (opt.innerText === "Move to trash" || opt.innerText === "Delete") {
-          var ariaLabel = opt.innerText === "Move to trash" ? "Move to Trash" : "Delete";
+          if (opt.innerText === "Move to trash" || opt.innerText === "Delete" || opt.innerText === "Remove Tag") {
+          var ariaLabel = opt.innerText === "Move to trash" ? "Move to Trash" : ( opt.innerText === "Delete" ? "Delete" : "Remove" );
           canDelete = true;
           opt.click();
           setTimeout(() => {
@@ -27,6 +39,15 @@ function deleteFacebookActivityLog_SearchHistory(index = 0) {
               }, 2000);
           }, 250);
           break;
+          }
+          if (opt.innerText === "Unlike" || opt.innerText === "Remove Reaction") {
+              canDelete = true;
+              opt.click();
+              setTimeout(() => {
+                    deleteFacebookActivityLog_SearchHistory(index);
+                    console.log("Reaction deleted");
+                  }, 2000);
+              break;
           }
       }
       if (!canDelete) {
